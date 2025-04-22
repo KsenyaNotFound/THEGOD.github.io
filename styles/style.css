@@ -1,0 +1,41 @@
+body {
+    background-color: #727759;
+}
+
+.text {
+    position: fixed;
+    font-family: 'Qwitcher Grypen', sans-serif;
+    left: 40px;
+    top: -50px;
+    font-size: 64px;
+    color: #D9968E;
+}
+
+.text1 {
+    position: fixed;
+    font-family: 'Prata', serif;
+    left: 130px;
+    top: 15px;
+    font-size: 36px;
+    color: #FBF8F1;
+}
+
+
+.text2 {
+    position: fixed;
+    font-family: 'Prata', serif;
+    left: 10%;
+    top: 30%;
+    font-size: 64px;
+    color: #FBF8F1;
+}
+
+.img1 {
+    position: fixed; /* Фиксированное позиционирование */
+    right: 0; /* Привязка к правому краю */
+    top: 50%; /* Центрирование по вертикали */
+    transform: translateY(-50%); /* Корректируем центрирование */
+    height: 1009px;
+    width: 763px;
+    border-radius: 0 0 0 250px;
+}
