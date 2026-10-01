@@ -1,41 +1,156 @@
+/* --- Базовые настройки --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: #727759;
+    font-family: 'Georgia', serif;
+    background-color: #6B7155;
+    color: #FFFFFF;
+    overflow-x: hidden;
 }
 
-.text {
+/* --- Кастомный скроллбар --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #6B7155;
+}
+::-webkit-scrollbar-thumb {
+    background: #8A906F;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #E8A2B6;
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #8A906F #6B7155;
+}
+
+/* --- ХЕДЕР --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 60px;
+    background-color: #6B7155;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.logo {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    color: #E8A2B6;
+    font-size: 28px;
+}
+
+.logo-script {
+    font-family: 'Brush Script MT', cursive;
+    font-style: italic;
+}
+
+.logo-caps {
+    font-family: 'Times New Roman', serif;
+    color: #FFFFFF;
+    font-size: 32px;
+    letter-spacing: 2px;
+}
+
+.nav {
+    display: flex;
+    gap: 40px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #FFFFFF;
+    font-size: 20px;
+    font-family: 'Georgia', serif;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: #E8A2B6;
+    text-shadow: 0 0 10px rgba(232, 162, 182, 0.5);
+}
+
+/* --- СЕКЦИЯ ПРИВЕТСТВИЯ --- */
+.hero {
+    min-height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(rgba(107, 113, 85, 0.7), rgba(107, 113, 85, 0.9));
+}
+
+.hero-content {
+    max-width: 900px;
+}
+
+.hero-title {
+    font-family: 'Georgia', serif;
+    font-size: 72px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.4);
+}
+
+.hero-subtitle {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-style: italic;
+    color: #E8A2B6;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+/* --- РЯБЬ ОТ КУРСОРА / КЛИКА --- */
+.ripple {
     position: fixed;
-    font-family: 'Qwitcher Grypen', sans-serif;
-    left: 40px;
-    top: -50px;
-    font-size: 64px;
-    color: #D9968E;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #A855F7;
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rippleExpand 1.5s ease-out forwards;
 }
 
-.text1 {
-    position: fixed;
-    font-family: 'Prata', serif;
-    left: 130px;
-    top: 15px;
-    font-size: 36px;
-    color: #FBF8F1;
+.ripple-strong {
+    border-width: 2.5px;
+    animation-duration: 1.8s;
 }
 
-
-.text2 {
-    position: fixed;
-    font-family: 'Prata', serif;
-    left: 10%;
-    top: 30%;
-    font-size: 64px;
-    color: #FBF8F1;
+@keyframes rippleExpand {
+    0%   { transform: translate(-50%, -50%) scale(0);  opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(10); opacity: 0; }
+}
+/* --- Запрет выделения текста --- */
+body {
+    user-select: none;
+    -webkit-user-select: none;   /* Safari */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* IE / Edge */
 }
 
-.img1 {
-    position: fixed; /* Фиксированное позиционирование */
-    right: 0; /* Привязка к правому краю */
-    top: 50%; /* Центрирование по вертикали */
-    transform: translateY(-50%); /* Корректируем центрирование */
-    height: 1009px;
-    width: 763px;
-    border-radius: 0 0 0 250px;
+/* На всякий случай — запрет перетаскивания картинок */
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
 }
