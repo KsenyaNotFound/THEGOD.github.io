@@ -5,11 +5,22 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #8A906F #6B7155;
+}
+
 body {
-    font-family: 'Georgia', serif;
+    font-family: 'Prata', serif;
     background-color: #6B7155;
     color: #FFFFFF;
-    overflow-x: hidden;
+    overflow: hidden;
+    height: 100vh;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* --- Кастомный скроллбар --- */
@@ -27,11 +38,6 @@ body {
     background: #E8A2B6;
 }
 
-html {
-    scrollbar-width: thin;
-    scrollbar-color: #8A906F #6B7155;
-}
-
 /* --- ХЕДЕР --- */
 .header {
     display: flex;
@@ -40,8 +46,12 @@ html {
     padding: 30px 60px;
     background-color: #6B7155;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    position: relative;
-    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    height: 100px;
 }
 
 .logo {
@@ -53,12 +63,14 @@ html {
 }
 
 .logo-script {
-    font-family: 'Brush Script MT', cursive;
+    font-family: 'Qwitcher Grypen', cursive;
     font-style: italic;
+    font-size: 42px;
+    line-height: 1;
 }
 
 .logo-caps {
-    font-family: 'Times New Roman', serif;
+    font-family: 'Prata', serif;
     color: #FFFFFF;
     font-size: 32px;
     letter-spacing: 2px;
@@ -72,9 +84,10 @@ html {
 .nav-link {
     text-decoration: none;
     color: #FFFFFF;
-    font-size: 20px;
-    font-family: 'Georgia', serif;
+    font-size: 18px;
+    font-family: 'Prata', serif;
     transition: 0.3s;
+    position: relative;
 }
 
 .nav-link:hover {
@@ -82,40 +95,114 @@ html {
     text-shadow: 0 0 10px rgba(232, 162, 182, 0.5);
 }
 
-/* --- СЕКЦИЯ ПРИВЕТСТВИЯ --- */
-.hero {
+/* Активная кнопка (текущая секция) */
+.nav-link.active {
+    color: #E8A2B6;
+    text-shadow: 0 0 10px rgba(232, 162, 182, 0.5);
+}
+
+/* --- КОНТЕЙНЕР ДЛЯ ПЛАВНОГО ПЕРЕЛИСТЫВАНИЯ --- */
+.scroll-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    padding-top: 100px;
+    scrollbar-width: none;
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- СЕКЦИИ --- */
+.section {
     min-height: calc(100vh - 100px);
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     padding: 40px 20px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     position: relative;
-    z-index: 1;
+}
+
+.section.hero {
     background: linear-gradient(rgba(107, 113, 85, 0.7), rgba(107, 113, 85, 0.9));
 }
 
-.hero-content {
+.section.about {
+    background: linear-gradient(rgba(90, 96, 70, 0.95), rgba(80, 86, 62, 1));
+}
+
+.section.characters {
+    background: linear-gradient(rgba(70, 76, 56, 0.95), rgba(60, 66, 48, 1));
+}
+
+.section.history {
+    background: linear-gradient(rgba(50, 56, 40, 0.95), rgba(40, 46, 32, 1));
+}
+
+/* --- ТЕКСТ В СЕКЦИЯХ --- */
+.hero-content,
+.section-content {
     max-width: 900px;
 }
 
 .hero-title {
-    font-family: 'Georgia', serif;
+    font-family: 'Prata', serif;
     font-size: 72px;
     font-weight: normal;
     line-height: 1.2;
     color: #FFFFFF;
     margin-bottom: 30px;
     text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.4);
+    filter: url(#ripple-filter);
+    will-change: filter;
 }
 
 .hero-subtitle {
-    font-family: 'Georgia', serif;
+    font-family: 'Prata', serif;
     font-size: 24px;
     font-style: italic;
     color: #E8A2B6;
     line-height: 1.6;
     letter-spacing: 1px;
+    filter: url(#ripple-filter);
+    will-change: filter;
+}
+
+.section-title {
+    font-family: 'Prata', serif;
+    font-size: 56px;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.4);
+    filter: url(#ripple-filter);
+    will-change: filter;
+}
+
+.section-text {
+    font-family: 'Prata', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: #E8A2B6;
+    max-width: 700px;
+    line-height: 1.6;
+    margin: 0 auto;
+    filter: url(#ripple-filter);
+    will-change: filter;
+}
+
+/* --- SVG-ФИЛЬТР СПРЯТАН --- */
+.svg-filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
 }
 
 /* --- РЯБЬ ОТ КУРСОРА / КЛИКА --- */
@@ -126,7 +213,7 @@ html {
     border-radius: 50%;
     border: 1.5px solid #A855F7;
     pointer-events: none;
-    z-index: 1;
+    z-index: 5;
     transform: translate(-50%, -50%) scale(0);
     animation: rippleExpand 1.5s ease-out forwards;
 }
@@ -140,17 +227,15 @@ html {
     0%   { transform: translate(-50%, -50%) scale(0);  opacity: 0.9; }
     100% { transform: translate(-50%, -50%) scale(10); opacity: 0; }
 }
-/* --- Запрет выделения текста --- */
-body {
-    user-select: none;
-    -webkit-user-select: none;   /* Safari */
-    -moz-user-select: none;      /* Firefox */
-    -ms-user-select: none;       /* IE / Edge */
-}
 
-/* На всякий случай — запрет перетаскивания картинок */
+/* --- ЗАПРЕТ ВЫДЕЛЕНИЯ И ПЕРЕТАСКИВАНИЯ --- */
 img {
     -webkit-user-drag: none;
     user-select: none;
     pointer-events: none;
+}
+
+input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
 }

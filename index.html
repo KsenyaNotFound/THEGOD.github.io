@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,23 +9,80 @@
     <link href="https://fonts.googleapis.com/css?family=Prata&display=swap" rel="stylesheet">
 </head>
 <body>
-    = <header class="header">
+
+    <!-- ХЕДЕР -->
+    <header class="header">
         <div class="logo">
             <span class="logo-script">The</span>
             <span class="logo-caps">GOD</span>
         </div>
         <nav class="nav">
-            <a href="#" class="nav-link">О проекте</a>
-            <a href="#" class="nav-link">Персонажи</a>
-            <a href="#" class="nav-link">История</a>
+            <a href="#about" class="nav-link">О проекте</a>
+            <a href="#characters" class="nav-link">Персонажи</a>
+            <a href="#history" class="nav-link">История</a>
         </nav>
     </header>
-     <main class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Добро пожаловать<br>в Мир Грёз!</h1>
-            <p class="hero-subtitle">Мы рады каждому страннику, посетившему нас.</p>
-        </div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ ПЛАВНОГО ПЕРЕЛИСТЫВАНИЯ -->
+    <main class="scroll-container">
+
+        <!-- SVG-ФИЛЬТР ДЛЯ ИСКАЖЕНИЯ ТЕКСТА -->
+        <svg class="svg-filters" width="0" height="0">
+            <defs>
+                <filter id="ripple-filter">
+                    <feTurbulence id="turbulence" type="fractalNoise"
+                                  baseFrequency="0.01 0.05" numOctaves="2" seed="3" result="noise">
+                        <animate id="noise-anim" attributeName="baseFrequency"
+                                 dur="6s" values="0.01 0.05; 0.02 0.08; 0.01 0.05"
+                                 repeatCount="indefinite" />
+                    </feTurbulence>
+                    <feDisplacementMap id="displacement" in="SourceGraphic" in2="noise"
+                                       scale="0" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+            </defs>
+        </svg>
+
+        <!-- СЕКЦИЯ 1: ГЛАВНАЯ -->
+        <section class="section hero" id="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Добро пожаловать<br>в Мир Грёз!</h1>
+                <p class="hero-subtitle">Мы рады каждому страннику, посетившему нас.</p>
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ 2: О ПРОЕКТЕ -->
+        <section class="section about" id="about">
+            <div class="section-content">
+                <h2 class="section-title">О проекте</h2>
+                <p class="section-text">
+                    Мир Грёз — это пространство, где реальность переплетается с фантазией.
+                    Здесь каждый найдёт свою историю.
+                </p>
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ 3: ПЕРСОНАЖИ -->
+        <section class="section characters" id="characters">
+            <div class="section-content">
+                <h2 class="section-title">Персонажи</h2>
+                <p class="section-text">
+                    Герои, которых вы встретите в этом мире, — каждый со своей судьбой.
+                </p>
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ 4: ИСТОРИЯ -->
+        <section class="section history" id="history">
+            <div class="section-content">
+                <h2 class="section-title">История</h2>
+                <p class="section-text">
+                    Каждая легенда начинается с одного шага. Ваша — уже здесь.
+                </p>
+            </div>
+        </section>
+
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>
