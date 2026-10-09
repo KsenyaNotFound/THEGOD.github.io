@@ -23,10 +23,8 @@
         </nav>
     </header>
 
-    <!-- КОНТЕЙНЕР ДЛЯ ПЛАВНОГО ПЕРЕЛИСТЫВАНИЯ -->
     <main class="scroll-container">
 
-        <!-- SVG-ФИЛЬТР ДЛЯ ИСКАЖЕНИЯ ТЕКСТА -->
         <svg class="svg-filters" width="0" height="0">
             <defs>
                 <filter id="ripple-filter">
@@ -51,15 +49,29 @@
         </section>
 
         <!-- СЕКЦИЯ 2: О ПРОЕКТЕ -->
-        <section class="section about" id="about">
-            <div class="section-content">
-                <h2 class="section-title">О проекте</h2>
-                <p class="section-text">
-                    Мир Грёз — это пространство, где реальность переплетается с фантазией.
-                    Здесь каждый найдёт свою историю.
-                </p>
+<section class="section about" id="about">
+    <h2 class="about-heading">О проекте</h2>
+    <div class="cards">
+        <div class="card" data-target="devs">
+            <h3 class="card-title">Разработчики</h3>
+        </div>
+        <div class="card" data-target="game">
+            <h3 class="card-title">Об игре</h3>
+        </div>
+        <div class="card" data-target="specs">
+            <h3 class="card-title">Системные требования</h3>
+        </div>
+    </div>
+    <div class="modal" id="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Закрыть">×</button>
+            <h2 class="modal-title"></h2>
+            <div class="modal-body">
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <!-- СЕКЦИЯ 3: ПЕРСОНАЖИ -->
         <section class="section characters" id="characters">

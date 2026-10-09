@@ -1,4 +1,3 @@
-/* --- Базовые настройки --- */
 * {
     margin: 0;
     padding: 0;
@@ -23,7 +22,6 @@ body {
     -ms-user-select: none;
 }
 
-/* --- Кастомный скроллбар --- */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -38,7 +36,6 @@ body {
     background: #E8A2B6;
 }
 
-/* --- ХЕДЕР --- */
 .header {
     display: flex;
     justify-content: space-between;
@@ -95,13 +92,11 @@ body {
     text-shadow: 0 0 10px rgba(232, 162, 182, 0.5);
 }
 
-/* Активная кнопка (текущая секция) */
 .nav-link.active {
     color: #E8A2B6;
     text-shadow: 0 0 10px rgba(232, 162, 182, 0.5);
 }
 
-/* --- КОНТЕЙНЕР ДЛЯ ПЛАВНОГО ПЕРЕЛИСТЫВАНИЯ --- */
 .scroll-container {
     height: 100vh;
     overflow-y: scroll;
@@ -115,7 +110,6 @@ body {
     display: none;
 }
 
-/* --- СЕКЦИИ --- */
 .section {
     min-height: calc(100vh - 100px);
     width: 100%;
@@ -135,6 +129,10 @@ body {
 
 .section.about {
     background: linear-gradient(rgba(90, 96, 70, 0.95), rgba(80, 86, 62, 1));
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .section.characters {
@@ -145,7 +143,6 @@ body {
     background: linear-gradient(rgba(50, 56, 40, 0.95), rgba(40, 46, 32, 1));
 }
 
-/* --- ТЕКСТ В СЕКЦИЯХ --- */
 .hero-content,
 .section-content {
     max-width: 900px;
@@ -197,7 +194,6 @@ body {
     will-change: filter;
 }
 
-/* --- SVG-ФИЛЬТР СПРЯТАН --- */
 .svg-filters {
     position: absolute;
     width: 0;
@@ -205,30 +201,199 @@ body {
     pointer-events: none;
 }
 
-/* --- РЯБЬ ОТ КУРСОРА / КЛИКА --- */
-.ripple {
+.about-heading {
+    position: absolute;
+    top: 130px;
+    right: 60px;
+    font-family: 'Prata', serif;
+    font-size: 24px;
+    font-weight: normal;
+    color: #FFFFFF;
+    letter-spacing: 2px;
+}
+
+.cards {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 1100px;
+    padding: 0 40px;
+}
+
+.card {
+    width: 280px;
+    height: 180px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.4s ease, background 0.4s ease, border-color 0.4s ease;
+    user-select: none;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.03);
+    background: rgba(232, 162, 182, 0.15);
+    border-color: #E8A2B6;
+    box-shadow: 0 12px 30px rgba(232, 162, 182, 0.25);
+}
+
+.card-title {
+    font-family: 'Prata', serif;
+    font-size: 22px;
+    font-weight: normal;
+    color: #FFFFFF;
+    letter-spacing: 1px;
+}
+
+/* МОДАЛЬНОЕ ОКНО  */
+.modal {
     position: fixed;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 1.5px solid #A855F7;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     pointer-events: none;
-    z-index: 5;
-    transform: translate(-50%, -50%) scale(0);
-    animation: rippleExpand 1.5s ease-out forwards;
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
-.ripple-strong {
-    border-width: 2.5px;
-    animation-duration: 1.8s;
+.modal.open {
+    pointer-events: auto;
+    opacity: 1;
 }
 
-@keyframes rippleExpand {
-    0%   { transform: translate(-50%, -50%) scale(0);  opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) scale(10); opacity: 0; }
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
 }
 
-/* --- ЗАПРЕТ ВЫДЕЛЕНИЯ И ПЕРЕТАСКИВАНИЯ --- */
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 50px 60px;
+    background: linear-gradient(160deg, #5a6046 0%, #4a5038 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    z-index: 2;
+
+    transform: scaleX(0.05) scaleY(0.05);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.4s ease-out;
+}
+
+.modal.open .modal-content {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+}
+
+.modal-title {
+    font-family: 'Prata', serif;
+    font-size: 40px;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.modal-body {
+    font-family: 'Prata', serif;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #E8E8E8;
+}
+
+.modal-body p {
+    margin-bottom: 20px;
+}
+
+.modal-body img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    border-radius: 12px;
+    opacity: 0.9;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: #FFFFFF;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-close:hover {
+    background: #E8A2B6;
+    border-color: #E8A2B6;
+    transform: rotate(90deg);
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: #8A906F;
+    border-radius: 10px;
+}
+
+.side-image {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 200px;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.side-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.side-image-left {
+    left: 0;
+}
+
+.side-image-right {
+    right: 0;
+    transform: scaleX(-1);
+}
+
 img {
     -webkit-user-drag: none;
     user-select: none;
