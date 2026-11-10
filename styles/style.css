@@ -1,3 +1,5 @@
+:root { --header-height: 100px; --page-gutter: clamp(20px, 4vw, 60px); }
+
 * {
     margin: 0;
     padding: 0;
@@ -16,6 +18,7 @@ body {
     color: #FFFFFF;
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -40,7 +43,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 30px 60px;
+    padding: 16px var(--page-gutter);
+    padding-top: calc(16px + env(safe-area-inset-top));
     background-color: #6B7155;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     position: fixed;
@@ -48,7 +52,7 @@ body {
     left: 0;
     right: 0;
     z-index: 10;
-    height: 100px;
+    height: calc(var(--header-height) + env(safe-area-inset-top));
 }
 
 .logo {
@@ -99,10 +103,12 @@ body {
 
 .scroll-container {
     height: 100vh;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-snap-type: y proximity;
     scroll-behavior: smooth;
-    padding-top: 100px;
+    padding-top: calc(var(--header-height) + env(safe-area-inset-top));
     scrollbar-width: none;
 }
 
@@ -111,15 +117,16 @@ body {
 }
 
 .section {
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - var(--header-height) - env(safe-area-inset-top));
+    min-height: calc(100dvh - var(--header-height) - env(safe-area-inset-top));
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 40px 20px;
+    padding: clamp(40px, 7vh, 80px) var(--page-gutter);
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+
     position: relative;
 }
 
@@ -150,7 +157,7 @@ body {
 
 .hero-title {
     font-family: 'Prata', serif;
-    font-size: 72px;
+    font-size: clamp(32px, 5.5vw, 80px);
     font-weight: normal;
     line-height: 1.2;
     color: #FFFFFF;
@@ -160,7 +167,7 @@ body {
 
 .hero-subtitle {
     font-family: 'Prata', serif;
-    font-size: 24px;
+    font-size: clamp(17px, 2vw, 26px);
     font-style: italic;
     color: #E8A2B6;
     line-height: 1.6;
@@ -169,7 +176,7 @@ body {
 
 .section-title {
     font-family: 'Prata', serif;
-    font-size: 56px;
+    font-size: clamp(30px, 4.4vw, 60px);
     font-weight: normal;
     color: #FFFFFF;
     margin-bottom: 30px;
@@ -178,7 +185,7 @@ body {
 
 .section-text {
     font-family: 'Prata', serif;
-    font-size: 22px;
+    font-size: clamp(17px, 1.8vw, 24px);
     font-style: italic;
     color: #E8A2B6;
     max-width: 700px;
@@ -189,9 +196,7 @@ body {
 
 
 .about-heading {
-    position: absolute;
-    top: 130px;
-    right: 60px;
+    align-self: flex-end;
     font-family: 'Prata', serif;
     font-size: 24px;
     font-weight: normal;
@@ -200,18 +205,19 @@ body {
 }
 
 .cards {
-    display: flex;
-    gap: 40px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 40px);
+    width: 100%;
     max-width: 1100px;
-    padding: 0 40px;
 }
 
 .card {
-    width: 280px;
-    height: 180px;
+    width: 100%;
+    min-height: 180px;
+    padding: 24px 16px;
+    color: inherit;
+    font: inherit;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25);
@@ -270,6 +276,8 @@ body {
     width: 90%;
     max-width: 900px;
     max-height: 85vh;
+    max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
     overflow-y: auto;
     padding: 50px 60px;
     background: linear-gradient(160deg, #5a6046 0%, #4a5038 100%);
@@ -323,8 +331,8 @@ body {
     position: absolute;
     top: 20px;
     right: 25px;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
@@ -392,18 +400,21 @@ input, textarea {
     -webkit-user-select: text;
 }
 /* Нижняя навигация и адаптивная компоновка. */
-.scroll-container { scroll-padding-top: 100px; }
+.section.about { flex-direction: column; gap: clamp(32px, 6vh, 64px); }
+.hero-content, .section-content, .footer-grid > * { min-width: 0; overflow-wrap: anywhere; }
+a:focus-visible, button:focus-visible { outline: 2px solid #e8a2b6; outline-offset: 5px; }
+.scroll-container { scroll-padding-top: calc(var(--header-height) + env(safe-area-inset-top)); }
 .footer {
     position: relative;
-    padding: 72px 60px 28px;
+    padding: 72px var(--page-gutter) calc(28px + env(safe-area-inset-bottom));
     background: #172d24;
     color: #d8dfd5;
     scroll-snap-align: start;
 }
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 0.8fr;
-    gap: 64px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr);
+    gap: clamp(24px, 4vw, 64px);
     max-width: 1200px;
     margin: 0 auto 56px;
 }
@@ -415,23 +426,49 @@ input, textarea {
 .footer a:hover, .footer a:focus-visible { color: #e8a2b6; }
 .footer nav a { display: block; margin-bottom: 16px; font-size: 15px; }
 .footer-bottom { max-width: 1200px; margin: auto; padding-top: 24px; border-top: 1px solid #ffffff26; display: flex; justify-content: space-between; gap: 20px; font-size: 13px; }
-@media (max-width: 700px) {
-    .header { padding: 20px; }
-    .nav { gap: 14px; }
-    .nav-link { font-size: 12px; }
-    .logo { gap: 2px; }
-    .logo-caps { font-size: 24px; }
-    .hero-title { font-size: clamp(34px, 8vw, 56px); }
-    .hero-subtitle, .section-text { font-size: 18px; }
-    .section-title { font-size: 38px; }
-    .about { flex-direction: column; gap: 32px; }
-    .about-heading { position: static; }
-    .cards { padding: 0; gap: 20px; }
-    .footer { padding: 48px 24px 24px; }
-    .footer-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 32px; }
+@media (max-width: 1024px) {
+    :root { --header-height: 88px; }
+    .nav { gap: 24px; }
+    .nav-link { font-size: 16px; }
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 700px; }
+    .card:last-child { grid-column: 1 / -1; width: calc(50% - 10px); justify-self: center; }
+    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .footer-intro { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+    :root { --header-height: 120px; }
+    .header { flex-direction: column; justify-content: center; gap: 8px; padding-bottom: 8px; }
+    .logo-script { font-size: 34px; }
+    .logo-caps { font-size: 26px; }
+    .nav { width: 100%; justify-content: center; gap: clamp(12px, 4vw, 24px); }
+    .nav-link { font-size: clamp(12px, 3.4vw, 15px); min-height: 44px; display: flex; align-items: center; white-space: nowrap; }
+    .cards { grid-template-columns: minmax(0, 1fr); max-width: 380px; }
+    .card, .card:last-child { grid-column: auto; width: 100%; min-height: 144px; }
+    .card-title { font-size: 20px; }
+    .about-heading { align-self: center; }
+    .footer { padding-top: 48px; }
+    .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; margin-bottom: 32px; }
     .footer-bottom { flex-direction: column; }
-    .modal-content { padding: 60px 24px 24px; }
-    .modal-title { font-size: 28px; }
+    .footer nav a, .footer-bottom a { min-height: 44px; display: flex; align-items: center; margin-bottom: 0; }
+    .modal-content { width: calc(100% - 24px); padding: 76px 20px 24px; border-radius: 18px; }
+    .modal-title { font-size: clamp(23px, 6vw, 32px); overflow-wrap: anywhere; }
+    .modal-body { font-size: 16px; }
+    .modal-close { top: 16px; right: 16px; }
+}
+@media (max-height: 500px) and (min-width: 601px) {
+    :root { --header-height: 72px; }
+    .header { padding-bottom: 8px; padding-top: calc(8px + env(safe-area-inset-top)); }
+    .section { padding-top: 32px; padding-bottom: 32px; }
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1100px; }
+    .card, .card:last-child { grid-column: auto; width: 100%; min-height: 120px; }
+    .card-title { font-size: 17px; }
+    .modal-content { padding: 64px 24px 24px; }
+}
+@media (max-width: 600px), (max-height: 500px) {
+    .scroll-container { scroll-snap-type: none; }
+}
+@media (hover: none) {
+    .card:hover { transform: none; box-shadow: none; }
 }
 @media (prefers-reduced-motion: reduce) {
     html, .scroll-container { scroll-behavior: auto; }
