@@ -76,7 +76,7 @@ document.addEventListener('keydown', (e) => {
     canvas.width = canvas.height = 112;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const targets = [...document.querySelectorAll('.section, .footer, .modal-content')].map((element, index) => {
+    const targets = [...document.querySelectorAll('.section, .modal-content')].map((element, index) => {
         const filter = document.createElementNS(ns, 'filter');
         filter.id = `water-${index}`;
         filter.setAttribute('filterUnits', 'userSpaceOnUse');
@@ -92,7 +92,11 @@ document.addEventListener('keydown', (e) => {
         displacement.setAttribute('yChannelSelector', 'G');
         filter.append(map, displacement);
         defs.append(filter);
-        return { element, filter, map, waves: [] };
+        const outline = document.createElement('canvas');
+        outline.className = 'water-outlines';
+        outline.setAttribute('aria-hidden', 'true');
+        element.append(outline);
+        return { element, filter, map, outline, waves: [] };
     });
     let frame = 0;
     let lastPaint = 0;
@@ -100,7 +104,7 @@ document.addEventListener('keydown', (e) => {
     function clear() {
         cancelAnimationFrame(frame);
         frame = 0;
-        targets.forEach(t => { t.waves = []; t.element.style.removeProperty('filter'); });
+        targets.forEach(t => { t.waves = []; t.element.style.removeProperty('filter'); t.outline.hidden = true; });
     }
     function animate(now) {
         frame = 0;
@@ -113,9 +117,38 @@ document.addEventListener('keydown', (e) => {
             const rect = target.element.getBoundingClientRect();
             if (!target.waves.length || rect.bottom <= 100 || rect.top >= innerHeight) {
                 target.element.style.removeProperty('filter');
+                target.outline.hidden = true;
                 continue;
             }
             active = true;
+            // Контур движется с тем же радиусом и затуханием, что и искажение.
+            const outline = target.outline;
+            outline.hidden = false;
+            const ratio = Math.min(devicePixelRatio || 1, 1.5);
+            const width = Math.round(rect.width * ratio);
+            const height = Math.round(rect.height * ratio);
+            if (outline.width !== width || outline.height !== height) {
+                outline.width = width;
+                outline.height = height;
+            }
+            const pen = outline.getContext('2d');
+            if (pen) {
+                pen.setTransform(ratio, 0, 0, ratio, 0, 0);
+                pen.clearRect(0, 0, rect.width, rect.height);
+                for (const wave of target.waves) {
+                    const age = (now - wave.time) / 1000;
+                    const radius = age * 170;
+                    const fade = Math.sin(Math.min(age / 0.12, 1) * Math.PI / 2) * (1 - age / 1.5);
+                    for (const [offset, alpha, color] of [[0, 0.34, '226, 242, 222'], [5, 0.18, '18, 42, 33'], [-22, 0.12, '232, 162, 182']]) {
+                        if (radius + offset <= 0) continue;
+                        pen.beginPath();
+                        pen.arc(wave.x, wave.y, radius + offset, 0, Math.PI * 2);
+                        pen.strokeStyle = `rgba(${color}, ${fade * alpha})`;
+                        pen.lineWidth = offset === 0 ? 1.4 : 1;
+                        pen.stroke();
+                    }
+                }
+            }
             const image = ctx.createImageData(112, 112);
             for (let y = 0; y < 112; y++) {
                 for (let x = 0; x < 112; x++) {
