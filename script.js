@@ -61,142 +61,40 @@ document.addEventListener('keydown', (e) => {
         closeModal();
     }
 });
-// Локальные затухающие волны смещают реальные пиксели текста и фона.
+// Несколько колец от капли — только при клике, без искажения содержимого.
 (() => {
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    const mouse = matchMedia('(hover: hover) and (pointer: fine)');
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.classList.add('svg-filters');
-    svg.setAttribute('aria-hidden', 'true');
-    const defs = document.createElementNS(ns, 'defs');
-    svg.append(defs);
-    document.body.append(svg);
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = 112;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const targets = [...document.querySelectorAll('.section, .modal-content')].map((element, index) => {
-        const filter = document.createElementNS(ns, 'filter');
-        filter.id = `water-${index}`;
-        filter.setAttribute('filterUnits', 'userSpaceOnUse');
-        filter.setAttribute('color-interpolation-filters', 'sRGB');
-        const map = document.createElementNS(ns, 'feImage');
-        map.setAttribute('result', 'waves');
-        map.setAttribute('preserveAspectRatio', 'none');
-        const displacement = document.createElementNS(ns, 'feDisplacementMap');
-        displacement.setAttribute('in', 'SourceGraphic');
-        displacement.setAttribute('in2', 'waves');
-        displacement.setAttribute('scale', '22');
-        displacement.setAttribute('xChannelSelector', 'R');
-        displacement.setAttribute('yChannelSelector', 'G');
-        filter.append(map, displacement);
-        defs.append(filter);
-        const outline = document.createElement('canvas');
-        outline.className = 'water-outlines';
-        outline.setAttribute('aria-hidden', 'true');
-        element.append(outline);
-        return { element, filter, map, outline, waves: [] };
-    });
-    let frame = 0;
-    let lastPaint = 0;
-    let lastDrop = 0;
-    function clear() {
-        cancelAnimationFrame(frame);
-        frame = 0;
-        targets.forEach(t => { t.waves = []; t.element.style.removeProperty('filter'); t.outline.hidden = true; });
+    const drops = new Set();
+    function clearDrops() {
+        for (const drop of drops) drop.remove();
+        drops.clear();
     }
-    function animate(now) {
-        frame = 0;
-        if (motion.matches || !mouse.matches || document.hidden) { clear(); return; }
-        if (now - lastPaint < 32) { frame = requestAnimationFrame(animate); return; }
-        lastPaint = now;
-        let active = false;
-        for (const target of targets) {
-            target.waves = target.waves.filter(w => now - w.time < 1500);
-            const rect = target.element.getBoundingClientRect();
-            if (!target.waves.length || rect.bottom <= 100 || rect.top >= innerHeight) {
-                target.element.style.removeProperty('filter');
-                target.outline.hidden = true;
-                continue;
-            }
-            active = true;
-            // Контур движется с тем же радиусом и затуханием, что и искажение.
-            const outline = target.outline;
-            outline.hidden = false;
-            const ratio = Math.min(devicePixelRatio || 1, 1.5);
-            const width = Math.round(rect.width * ratio);
-            const height = Math.round(rect.height * ratio);
-            if (outline.width !== width || outline.height !== height) {
-                outline.width = width;
-                outline.height = height;
-            }
-            const pen = outline.getContext('2d');
-            if (pen) {
-                pen.setTransform(ratio, 0, 0, ratio, 0, 0);
-                pen.clearRect(0, 0, rect.width, rect.height);
-                for (const wave of target.waves) {
-                    const age = (now - wave.time) / 1000;
-                    const radius = age * 170;
-                    const fade = Math.sin(Math.min(age / 0.12, 1) * Math.PI / 2) * (1 - age / 1.5);
-                    for (const [offset, alpha, color] of [[0, 0.34, '226, 242, 222'], [5, 0.18, '18, 42, 33'], [-22, 0.12, '232, 162, 182']]) {
-                        if (radius + offset <= 0) continue;
-                        pen.beginPath();
-                        pen.arc(wave.x, wave.y, radius + offset, 0, Math.PI * 2);
-                        pen.strokeStyle = `rgba(${color}, ${fade * alpha})`;
-                        pen.lineWidth = offset === 0 ? 1.4 : 1;
-                        pen.stroke();
-                    }
-                }
-            }
-            const image = ctx.createImageData(112, 112);
-            for (let y = 0; y < 112; y++) {
-                for (let x = 0; x < 112; x++) {
-                    let dx = 0, dy = 0;
-                    for (const wave of target.waves) {
-                        const age = (now - wave.time) / 1000;
-                        const vx = x / 111 * (rect.width + 32) - 16 - wave.x;
-                        const vy = y / 111 * (rect.height + 32) - 16 - wave.y;
-                        const distance = Math.hypot(vx, vy);
-                        const ring = distance - age * 170;
-                        const strength = Math.sin(ring / 13) * Math.exp(-(ring * ring) / 6500)
-                            * Math.sin(Math.min(age / 0.12, 1) * Math.PI / 2) * (1 - age / 1.5) * 0.42;
-                        dx += vx / (distance || 1) * strength;
-                        dy += vy / (distance || 1) * strength;
-                    }
-                    const i = (y * 112 + x) * 4;
-                    image.data[i] = Math.round(128 + Math.max(-0.48, Math.min(0.48, dx)) * 255);
-                    image.data[i + 1] = Math.round(128 + Math.max(-0.48, Math.min(0.48, dy)) * 255);
-                    image.data[i + 2] = 128;
-                    image.data[i + 3] = 255;
-                }
-            }
-            ctx.putImageData(image, 0, 0);
-            target.filter.setAttribute('x', '-16');
-            target.filter.setAttribute('y', '-16');
-            target.filter.setAttribute('width', rect.width + 32);
-            target.filter.setAttribute('height', rect.height + 32);
-            target.map.setAttribute('x', '-16');
-            target.map.setAttribute('y', '-16');
-            target.map.setAttribute('width', rect.width + 32);
-            target.map.setAttribute('height', rect.height + 32);
-            target.map.setAttribute('href', canvas.toDataURL());
-            target.element.style.filter = `url(#${target.filter.id})`;
+    document.addEventListener('click', event => {
+        if (motion.matches || event.detail === 0 || event.target.closest('.header, .footer, .modal-backdrop')) return;
+        const surface = event.target.closest('.modal-content, .section');
+        if (!surface) return;
+        const rect = surface.getBoundingClientRect();
+        const drop = document.createElement('span');
+        drop.className = 'rain-drop';
+        drop.setAttribute('aria-hidden', 'true');
+        drop.style.setProperty('--drop-x', `${(event.clientX - rect.left) / rect.width * 100}%`);
+        drop.style.setProperty('--drop-y', `${(event.clientY - rect.top) / rect.height * 100}%`);
+        for (let i = 0; i < 3; i++) {
+            const ring = document.createElement('span');
+            ring.className = 'rain-ring';
+            ring.style.setProperty('--ring-delay', `${i * 160}ms`);
+            drop.append(ring);
         }
-        if (active) frame = requestAnimationFrame(animate);
-    }
-    document.addEventListener('pointermove', event => {
-        if (event.pointerType !== 'mouse' || motion.matches || !mouse.matches || event.target.closest('.header')) return;
-        const now = performance.now();
-        if (now - lastDrop < 70) return;
-        const target = targets.find(t => t.element.contains(event.target));
-        if (!target) return;
-        const rect = target.element.getBoundingClientRect();
-        target.waves.push({ x: event.clientX - rect.left, y: event.clientY - rect.top, time: now });
-        target.waves = target.waves.slice(-10);
-        lastDrop = now;
-        if (!frame) frame = requestAnimationFrame(animate);
-    }, { passive: true });
-    motion.addEventListener('change', clear);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) clear(); });
+        // Ограничиваем число одновременно видимых капель при частых кликах.
+        if (drops.size >= 6) {
+            const oldest = drops.values().next().value;
+            oldest.remove();
+            drops.delete(oldest);
+        }
+        surface.append(drop);
+        drops.add(drop);
+        setTimeout(() => { drop.remove(); drops.delete(drop); }, 1800);
+    });
+    motion.addEventListener('change', clearDrops);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clearDrops(); });
 })();
