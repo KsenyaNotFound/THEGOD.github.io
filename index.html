@@ -25,21 +25,6 @@
 
     <main class="scroll-container">
 
-        <svg class="svg-filters" width="0" height="0">
-            <defs>
-                <filter id="ripple-filter">
-                    <feTurbulence id="turbulence" type="fractalNoise"
-                                  baseFrequency="0.01 0.05" numOctaves="2" seed="3" result="noise">
-                        <animate id="noise-anim" attributeName="baseFrequency"
-                                 dur="6s" values="0.01 0.05; 0.02 0.08; 0.01 0.05"
-                                 repeatCount="indefinite" />
-                    </feTurbulence>
-                    <feDisplacementMap id="displacement" in="SourceGraphic" in2="noise"
-                                       scale="0" xChannelSelector="R" yChannelSelector="G" />
-                </filter>
-            </defs>
-        </svg>
-
         <!-- СЕКЦИЯ 1: ГЛАВНАЯ -->
         <section class="section hero" id="hero">
             <div class="hero-content">
@@ -62,15 +47,7 @@
             <h3 class="card-title">Системные требования</h3>
         </div>
     </div>
-    <div class="modal" id="modal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Закрыть">×</button>
-            <h2 class="modal-title"></h2>
-            <div class="modal-body">
-            </div>
-        </div>
-    </div>
+
 </section>
 
         <!-- СЕКЦИЯ 3: ПЕРСОНАЖИ -->
@@ -93,7 +70,36 @@
             </div>
         </section>
 
+        <footer class="footer" id="footer">
+            <div class="footer-grid">
+                <div class="footer-intro">
+                    <a class="footer-brand" href="#hero" aria-label="The GOD — на главную"><span class="logo-script">The</span> GOD</a>
+                    <p>Мир Грёз ближе, чем кажется.<br>Спасибо, что стали частью нашей истории.</p>
+                </div>
+                <div>
+                    <h2>О нас</h2>
+                    <p>Мы — команда энтузиастов, создающая The GOD. Здесь оживают истории, встречаются герои и начинается путешествие в Мир Грёз.</p>
+                </div>
+                <nav aria-label="Навигация в подвале">
+                    <h2>Исследовать мир</h2>
+                    <a href="#about">О проекте</a>
+                    <a href="#characters">Персонажи</a>
+                    <a href="#history">История</a>
+                </nav>
+            </div>
+            <div class="footer-bottom"><span>© The GOD · Мир Грёз</span><a href="#hero">Вернуться наверх ↑</a></div>
+        </footer>
     </main>
+
+    <div class="modal" id="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Закрыть">×</button>
+            <h2 class="modal-title"></h2>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

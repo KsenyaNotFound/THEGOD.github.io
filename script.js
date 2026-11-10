@@ -1,42 +1,3 @@
-const COLORS = ['#A855F7', '#8B5CF6', '#9B7BE0', '#7C8B5E'];
-
-let lastRipple = 0;
-
-document.addEventListener('mousemove', (e) => {
-    const now = Date.now();
-    if (now - lastRipple < 150) return;  
-    lastRipple = now;
-
-    const ripple = document.createElement('div');
-    ripple.className = 'ripple';
-    ripple.style.left = e.clientX + 'px';
-    ripple.style.top = e.clientY + 'px';
-
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    ripple.style.borderColor = color;
-
-    document.body.appendChild(ripple);
-
-    setTimeout(() => ripple.remove(), 1500);
-});
-
-document.addEventListener('click', (e) => {
-    for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-            const ripple = document.createElement('div');
-            ripple.className = 'ripple ripple-strong';
-            ripple.style.left = e.clientX + 'px';
-            ripple.style.top = e.clientY + 'px';
-
-            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-            ripple.style.borderColor = color;
-
-            document.body.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 1800);
-        }, i * 120);
-    }
-});
-
 // МОДАЛЬНЫЕ ОКНА
 const modal = document.getElementById('modal');
 const modalTitle = modal ? modal.querySelector('.modal-title') : null;
@@ -100,3 +61,109 @@ document.addEventListener('keydown', (e) => {
         closeModal();
     }
 });
+// Локальные затухающие волны смещают реальные пиксели текста и фона.
+(() => {
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const mouse = matchMedia('(hover: hover) and (pointer: fine)');
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.classList.add('svg-filters');
+    svg.setAttribute('aria-hidden', 'true');
+    const defs = document.createElementNS(ns, 'defs');
+    svg.append(defs);
+    document.body.append(svg);
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 112;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const targets = [...document.querySelectorAll('.section, .footer, .modal-content')].map((element, index) => {
+        const filter = document.createElementNS(ns, 'filter');
+        filter.id = `water-${index}`;
+        filter.setAttribute('filterUnits', 'userSpaceOnUse');
+        filter.setAttribute('color-interpolation-filters', 'sRGB');
+        const map = document.createElementNS(ns, 'feImage');
+        map.setAttribute('result', 'waves');
+        map.setAttribute('preserveAspectRatio', 'none');
+        const displacement = document.createElementNS(ns, 'feDisplacementMap');
+        displacement.setAttribute('in', 'SourceGraphic');
+        displacement.setAttribute('in2', 'waves');
+        displacement.setAttribute('scale', '22');
+        displacement.setAttribute('xChannelSelector', 'R');
+        displacement.setAttribute('yChannelSelector', 'G');
+        filter.append(map, displacement);
+        defs.append(filter);
+        return { element, filter, map, waves: [] };
+    });
+    let frame = 0;
+    let lastPaint = 0;
+    let lastDrop = 0;
+    function clear() {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        targets.forEach(t => { t.waves = []; t.element.style.removeProperty('filter'); });
+    }
+    function animate(now) {
+        frame = 0;
+        if (motion.matches || !mouse.matches || document.hidden) { clear(); return; }
+        if (now - lastPaint < 32) { frame = requestAnimationFrame(animate); return; }
+        lastPaint = now;
+        let active = false;
+        for (const target of targets) {
+            target.waves = target.waves.filter(w => now - w.time < 1500);
+            const rect = target.element.getBoundingClientRect();
+            if (!target.waves.length || rect.bottom <= 100 || rect.top >= innerHeight) {
+                target.element.style.removeProperty('filter');
+                continue;
+            }
+            active = true;
+            const image = ctx.createImageData(112, 112);
+            for (let y = 0; y < 112; y++) {
+                for (let x = 0; x < 112; x++) {
+                    let dx = 0, dy = 0;
+                    for (const wave of target.waves) {
+                        const age = (now - wave.time) / 1000;
+                        const vx = x / 111 * (rect.width + 32) - 16 - wave.x;
+                        const vy = y / 111 * (rect.height + 32) - 16 - wave.y;
+                        const distance = Math.hypot(vx, vy);
+                        const ring = distance - age * 170;
+                        const strength = Math.sin(ring / 13) * Math.exp(-(ring * ring) / 6500)
+                            * Math.sin(Math.min(age / 0.12, 1) * Math.PI / 2) * (1 - age / 1.5) * 0.42;
+                        dx += vx / (distance || 1) * strength;
+                        dy += vy / (distance || 1) * strength;
+                    }
+                    const i = (y * 112 + x) * 4;
+                    image.data[i] = Math.round(128 + Math.max(-0.48, Math.min(0.48, dx)) * 255);
+                    image.data[i + 1] = Math.round(128 + Math.max(-0.48, Math.min(0.48, dy)) * 255);
+                    image.data[i + 2] = 128;
+                    image.data[i + 3] = 255;
+                }
+            }
+            ctx.putImageData(image, 0, 0);
+            target.filter.setAttribute('x', '-16');
+            target.filter.setAttribute('y', '-16');
+            target.filter.setAttribute('width', rect.width + 32);
+            target.filter.setAttribute('height', rect.height + 32);
+            target.map.setAttribute('x', '-16');
+            target.map.setAttribute('y', '-16');
+            target.map.setAttribute('width', rect.width + 32);
+            target.map.setAttribute('height', rect.height + 32);
+            target.map.setAttribute('href', canvas.toDataURL());
+            target.element.style.filter = `url(#${target.filter.id})`;
+        }
+        if (active) frame = requestAnimationFrame(animate);
+    }
+    document.addEventListener('pointermove', event => {
+        if (event.pointerType !== 'mouse' || motion.matches || !mouse.matches || event.target.closest('.header')) return;
+        const now = performance.now();
+        if (now - lastDrop < 70) return;
+        const target = targets.find(t => t.element.contains(event.target));
+        if (!target) return;
+        const rect = target.element.getBoundingClientRect();
+        target.waves.push({ x: event.clientX - rect.left, y: event.clientY - rect.top, time: now });
+        target.waves = target.waves.slice(-10);
+        lastDrop = now;
+        if (!frame) frame = requestAnimationFrame(animate);
+    }, { passive: true });
+    motion.addEventListener('change', clear);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clear(); });
+})();
